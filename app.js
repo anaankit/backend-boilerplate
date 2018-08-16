@@ -56,6 +56,8 @@ fs.readdirSync(routesPath).forEach(function (file) {
 
 // socket io connection handler if required  
 
+const socketLib = require("./app/libs/socketLib");
+const socketServer = socketLib.setServer(server);
 
 // end of socket io coonnection haldler
 

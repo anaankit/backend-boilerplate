@@ -4,6 +4,11 @@ const secretKey = "thisissecret";
 const logger = require('../libs/loggerLib');
 
 let generateToken = (data,cb) =>{
+    
+    delete data.listArr
+    delete data.friendReq
+    delete data.friendList
+    
     try{
 
         let claims = {

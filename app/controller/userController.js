@@ -65,6 +65,7 @@ let signUpFucntion = (req,res) =>{
                     password: passwordLib.hashpassword(req.body.password),
                     email: req.body.email,
                     mobileNumber: req.body.mobileNumber,
+                    countryCode:req.body.countryCode,
                     createdOn: time.now()
                 })
 
@@ -276,8 +277,295 @@ let loginFunction = (req,res) =>{
 
 } // end of login function
 
+let getUserDetails = (req,res) =>{
+
+    userModel.find({userId:req.body.userId})
+    .exec((err,result)=>{
+
+        if(err){
+            let apiResponse = response.generate(true,'error in searching for user',400,null);
+            res.send(apiResponse)
+        }else if(check.isEmpty(result)){
+            let apiResponse = response.generate(true,'no such users exists',400,null);
+            res.send(apiResponse)
+        }else{
+            let apiResponse = response.generate(false,'user details found',200,result);
+            res.send(apiResponse);
+        }
+
+    })
+} //  end of get userDetails
+
+let updateUser  = (req,res) =>{
+    let options = req.body
+    userModel.update({userId:req.body.userId},options)
+    .exec((err,result)=>{
+        if(err){
+            let apiResponse = response.generate(true,'error in searching for user',400,null);
+            res.send(apiResponse)
+        }else{
+            let apiResponse = response.generate(false,'user details updated',200,result);
+            res.send(apiResponse);
+        }
+    })
+} // end of update User
+
+let updateUserusingEmail = (req,res) =>{
+    let options = req.body
+    userModel.update({email:req.body.email},options)
+    .exec((err,result)=>{
+        if(err){
+            let apiResponse = response.generate(true,'error in searching for user',400,null);
+            res.send(apiResponse)
+        }else if(check.isEmpty(result)){
+            let apiResponse = response.generate(true,'no account found with email',400,null);
+            res.send(apiResponse)
+        }
+        else{
+            let apiResponse = response.generate(false,'user details updated',200,result);
+            res.send(apiResponse);
+        }
+    })
+} // end of update user using email
+
+
+let updateListArr = (req,res) =>{
+
+    userModel.findOne({userId:req.body.userId})
+    .exec((err,result)=>{
+        
+        if(err){
+            let apiResponse = response.generate(true,'error in searching for user',400,null);
+            res.send(apiResponse)
+        }else if(check.isEmpty(result)){
+            let apiResponse = response.generate(true,'no such users exists',400,null);
+            res.send(apiResponse)
+        }else{
+            
+            // let abc = {
+            //     indexPos:req.body.indexPos,
+            //     hList:req.body.hList
+            // }
+
+            result.listArr.push(req.body.list);
+
+            result.save((error,result)=>{
+
+                if(error){
+                    let apiResponse = response.generate(true,'error in saving in the array',400,null)
+                    res.send(apiResponse)
+                }else{
+                    let apiResponse = response.generate(false,'update successfull',200,result);
+                    res.send(apiResponse);
+                }
+
+            })
+
+        }
+
+        
+    })
+} // end of updateListArr
+
+let updateIndex = (req,res)=>{
+
+    userModel.findOneAndUpdate({userId:req.body.userId},{currentIndex:req.body.currentIndex})
+    .exec((err,result)=>{
+        if(err){
+
+            let apiResponse = response.generate(true,'unable ,400,nullto update',400,null);
+            res.send(apiResponse);
+
+        }else{
+            let apiResponse = response.generate(false,'update successfull',200,result);
+            res.send(apiResponse);
+        }
+    })
+
+} // end of  update index
+
+
+let getUserUsingEmail = (req,res) =>{
+
+    userModel.findOne({email:req.body.email})
+    .select('-_id -__v -password -listArr')
+    .exec((err,result)=>{
+        if(err){
+            let apiResponse = response.generate(true,'unable to search',400,null);
+            res.send(apiResponse)
+        }else if(check.isEmpty(result)){
+            let apiResponse = response.generate(true,'empty result returned',400,null);
+            res.send(apiResponse)
+        }else{
+            let apiResponse = response.generate(false,'user found',200,result);
+            res.send(apiResponse);
+        }
+    })
+
+}
+
+let addFrndReq = (req,res) =>{
+
+userModel.findOne({userId:req.body.userId})
+.exec((err,result)=>{
+    if(err){
+        let apiResponse = response.generate(true,'db error occured',400,null);
+        res.send(apiResponse);
+    }else if(check.isEmpty(result)){
+        let apiResponse = response.generate(true,'no such user found',400,null);
+        res.send(apiResponse)
+    }else{
+
+        result.friendReq.push(req.body);
+
+        result.save((error,results)=>{
+
+            if(error){
+                let apiResponse = response.generate(true,'unable to save',400,null);
+                res.send(apiResponse)
+            }else{
+                let apiResponse = response.generate(false,'list updated successfully',200,results);
+                res.send(apiResponse);
+            }
+
+        })
+
+    }
+})
+
+} // end of add frnd request
+
+let moveUser = (req,res) =>{
+
+    userModel.findOne({userId:req.body.userId})
+    .exec((err,result)=>{
+        if(err){
+            let apiResponse = response.generate(true,'unable to search', 400, null);
+            res.send(apiResponse)
+        }else if(check.isEmpty(result)){
+            let apiResponse = response.generate(true,'no such user exisits',400, null);
+            res.send(apiResponse)
+        }else{
+
+            for(let each of result.friendReq){
+                if(each.fromUserId == req.body.fromUserId){
+                    let temp = each;
+                    let index = result.friendReq.indexOf(each);
+                    result.friendReq.splice(index,1);
+                    result.friendList.push(temp);
+
+                    result.save((error,results)=>{
+
+                        // if(error){
+                        //     let apiResponse = response.generate(true,'unable to save',400,null);
+                        //     res.send(apiResponse)
+                        // }else{
+                        //     let apiResponse = response.generate(false,'details moved successfully',200,results)
+                        //     res.send(apiResponse);
+                        // }
+                    })
+
+                    userModel.findOne({userId:req.body.fromUserId})
+                    .exec((e,r)=>{
+
+                        if(e){
+                            let apiResponse = response.generate(true,'unable to save',400,null);
+                            res.send(apiResponse)
+                        }else{
+                            
+                            let xyz = {
+                                userId:req.body.fromUserId,
+                                fromUserId: result.userId,
+                                fromName:result.firstName+' '+result.lastName,
+                                fromEmail:result.email
+                            }
+
+                            r.friendList.push(xyz);
+                            r.save((er,re)=>{
+                                if(er){
+                                    let apiResponse = response.generate(true,'unable to save',400,null);
+                                    res.send(apiResponse)
+                                }else{
+                                    let apiResponse = response.generate(false,'details moved successfully',200,re)
+                                    res.send(apiResponse);
+                                }
+                            })
+                        }
+
+                    })
+
+                }
+            }
+
+        }
+    })
+    
+}
+
+let getAllUsers  = (req,res) =>{
+
+userModel.find()
+.select('email')
+.select('-_id')
+.exec((err,result)=>{
+    if(err){
+        let apiResponse = response.generate(true,'error occured while searching',400,null);
+        res.send(apiResponse)
+    }else if(check.isEmpty(result)){
+        let apiResponse = response.generate(true,'empty result returned',400,null);
+        res.send(apiResponse)
+    }else{
+        let apiResponse = response.generate(false,'all user details found',200,result)
+        res.send(apiResponse)
+    }
+})
+
+} //  end of get all users
+
+
+let getUserInfousingResetToken = (req,res) =>{
+    userModel.findOne({PasswordResetToken:req.params.token})
+    .exec((err,result)=>{
+        if(err){
+            let apiResponse = response.generate(true,'error occured while searching',400,null);
+            res.send(apiResponse)
+        }else if(check.isEmpty(result)){
+            let apiResponse = response.generate(true,'empty result returned',400,null);
+            res.send(apiResponse)
+        }else{
+            let apiResponse = response.generate(false,' user details found',200,result)
+            res.send(apiResponse)
+        }
+    })
+    
+} // end of get user info using reset token
+
+let updateUserPassword = (req,res) =>{
+    userModel.update({email:req.body.email},{password:passwordLib.hashpassword(req.body.password)})
+    .exec((err,result)=>{
+        if(err){
+            let apiResponse = response.generate(true,'error occured while searching',400,null);
+            res.send(apiResponse)
+        }else{
+            let apiResponse = response.generate(false,' user details updated',200,result)
+            res.send(apiResponse)
+        }
+    })
+} // end of update password
 
 module.exports = {
     signup:signUpFucntion,
-    login:loginFunction
+    login:loginFunction,
+    getUserDetails:getUserDetails,
+    updateUser:updateUser,
+    updateListArr:updateListArr,
+    updateIndex:updateIndex,
+    getUserUsingEmail:getUserUsingEmail,
+    addFrndReq:addFrndReq,
+    moveUser:moveUser,
+    getAllUsers:getAllUsers,
+    updateUserusingEmail:updateUserusingEmail,
+    updateUserPassword:updateUserPassword,
+    getUserInfousingResetToken:getUserInfousingResetToken
+
 }

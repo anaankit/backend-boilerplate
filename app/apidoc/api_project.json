@@ -1,0 +1,16 @@
+{
+  "name": "Todo-list backend",
+  "version": "1.0.0",
+  "description": "todo-list backend api",
+  "title": "TODO-list",
+  "url": "todo-list-backend.ankit-here.xyz",
+  "sampleUrl": false,
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2018-08-16T23:02:56.164Z",
+    "url": "http://apidocjs.com",
+    "version": "0.17.6"
+  }
+}

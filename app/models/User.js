@@ -30,9 +30,37 @@ let userSchema =  new Schema({
         type:Number,
         default:0
     },
+    countryCode:{
+        type:Number,
+        default:91
+    },
     createdOn:{
         type:Date,
         default:""
+    },
+    currentIndex:{
+        type:Number,
+        default:0
+    },
+    listArr:{
+        type:Array,
+        default:[]
+    },
+    friendReq:{
+        type:Array,
+        default:[]
+    },
+    friendList:{
+        type:Array,
+        default:[]
+    },
+    PasswordResetToken:{
+        type:String,
+        default:''
+    },
+    PasswordResetExpiration:{
+        type:String,
+        default:''
     }
 
 })

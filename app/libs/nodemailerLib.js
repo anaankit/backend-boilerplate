@@ -1,6 +1,6 @@
 'use strict';
 const nodemailer = require('nodemailer');
-const socketLib = require('../libs/socketLib');
+
 
 let result = false;
 // Generate test SMTP service account from ethereal.email
@@ -12,17 +12,17 @@ nodemailer.createTestAccount((err, account) => {
     let transporter = nodemailer.createTransport({
         service:"Gmail",
         auth: {
-            user: 'anaankit992@gmail.com', // generated ethereal user
-            pass: 'Welcome#2016' // generated ethereal password
+            user: 'projectankit33@gmail.com', // generated ethereal user
+            pass: 'Welcome@2016' // generated ethereal password
         }
     });
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Ankit 👻" <anaankit992@gmail.com>', // sender address
+        from: '"My-List 👻" <projectankit33@gmail.com>', // sender address
         to: mailDetails.receiver, // list of receivers
         subject: mailDetails.subject, // Subject line
-        text: mailDetails.text, // plain text body
+        // text: mailDetails.text, // plain text body
         html: mailDetails.html // html body
     };
 
