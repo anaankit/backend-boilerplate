@@ -9,7 +9,7 @@ const events = require('events');
 const eventsEmitter = new events.EventEmitter();
 const tokenLib = require('../libs/tokenLib');
 const response = require('../libs/responseLib');
-const nodeMailer = require('../libs/nodemailerLib')
+// const nodeMailer = require('../libs/nodemailerLib')
 
 let arr=[];
 
